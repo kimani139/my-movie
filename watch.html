@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 </head>
 <body>
+    <!-- Navigation -->
     <nav class="navbar" id="navbar">
         <div class="nav-container">
             <div class="nav-left">
@@ -38,19 +39,64 @@
         </div>
     </nav>
 
+    <!-- Player -->
     <main class="watch-page">
         <div class="watch-container">
             <button class="back-btn" id="backBtn">
                 <i class="fas fa-arrow-left"></i> Back
             </button>
+            
             <h2 id="playerTitle" class="player-title">Loading...</h2>
-            <div id="playerContainer">
-                <video id="videoPlayer" class="video-player"></video>
+            
+            <div id="playerContainer" style="background: var(--bg-card); border-radius: 12px; overflow: hidden;">
+                <!-- Video player will be injected here -->
+                <div style="display: flex; align-items: center; justify-content: center; min-height: 400px; color: var(--text-muted);">
+                    <div style="text-align: center;">
+                        <i class="fas fa-spinner fa-spin" style="font-size: 2rem; display: block; margin-bottom: 16px;"></i>
+                        <p>Loading trailer...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Movie Info -->
+            <div style="margin-top: 24px; padding: 20px; background: var(--bg-card); border-radius: var(--radius); border: 1px solid var(--border-color);">
+                <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 8px;">
+                    <i class="fas fa-info-circle" style="color: var(--accent);"></i>
+                    🎬 Playing official trailer. Full movies available with Premium!
+                </p>
+                <div style="display: flex; gap: 12px; flex-wrap: wrap; margin-top: 12px;">
+                    <button class="btn btn-primary" onclick="window.location.href='/details.html?id=' + new URLSearchParams(window.location.search).get('id')">
+                        <i class="fas fa-arrow-left"></i> Back to Details
+                    </button>
+                    <button class="btn btn-secondary" onclick="window.location.href='/movies.html'">
+                        <i class="fas fa-film"></i> Browse More
+                    </button>
+                </div>
             </div>
         </div>
     </main>
 
+    <!-- Toast -->
     <div id="toast" class="toast"></div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-brand">
+                <h3><i class="fas fa-film"></i> MyMovie</h3>
+                <p>Discover, explore, and enjoy movies.</p>
+            </div>
+            <div class="footer-links">
+                <a href="#">About</a>
+                <a href="#">Privacy</a>
+                <a href="#">Terms</a>
+                <a href="#">Contact</a>
+            </div>
+            <div class="footer-attribution">
+                <p>Powered by <a href="https://www.themoviedb.org/" target="_blank">TMDB</a></p>
+            </div>
+        </div>
+    </footer>
 
     <script type="module" src="/js/player.js"></script>
 </body>
