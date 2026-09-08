@@ -1,115 +1,36 @@
-    .search-result-item img {
-        width: 36px;
-        height: 54px;
-    }
+/* ===== RESET & BASE ===== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
 
-    .search-result-info h4 {
-        font-size: 0.75rem;
-    }
+:root {
+    --bg-primary: #0a0a0f;
+    --bg-secondary: #14141e;
+    --bg-card: #1a1a2e;
+    --bg-card-hover: #222244;
+    --text-primary: #ffffff;
+    --text-secondary: #b0b0c8;
+    --text-muted: #6b6b8a;
+    --accent: #e50914;
+    --accent-hover: #ff0a1a;
+    --accent-gradient: linear-gradient(135deg, #e50914, #ff6b35);
+    --border-color: #2a2a44;
+    --shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+    --radius: 12px;
+    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --font: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
 
-    .search-result-meta {
-        font-size: 0.65rem;
-        gap: 8px;
-    }
+html {
+    scroll-behavior: smooth;
+}
 
-    .search-result-fav {
-        font-size: 0.9rem;
-        padding: 4px;
-    }
-
-    .player-title {
-        font-size: 1.2rem;
-    }
-
-    .video-player {
-        max-height: 50vh;
-    }
-
-    .back-btn {
-        font-size: 0.8rem;
-        padding: 8px 16px;
-    }
-
-    .details-hero {
-        min-height: 300px;
-    }
-
-    .details-hero-content {
-        min-height: 300px;
-        padding: 16px;
-    }
-
-    .genre-tag {
-        font-size: 0.7rem;
-        padding: 3px 10px;
-    }
-
-    .empty-state h2 {
-        font-size: 1.4rem;
-    }
-
-    .empty-state i {
-        font-size: 3rem;
-    }
-
-
-/* ===== PRINT STYLES (optional) ===== */
-@media print {
-    .navbar,
-    .footer,
-    .back-btn,
-    .detail-actions,
-    .search-container {
-        display: none !important;
-    }
-
-    .hero {
-        height: auto !important;
-        min-height: auto !important;
-        max-height: none !important;
-        margin-top: 0 !important;
-    }
-
-    .hero-backdrop {
-        display: none !important;
-    }
-
-    .hero-text {
-        padding: 20px !important;
-        max-width: 100% !important;
-    }
-
-    .movie-card {
-        break-inside: avoid;
-        page-break-inside: avoid;
-    }
-
-    .details-hero {
-        min-height: auto !important;
-    }
-
-    .details-hero-overlay {
-        background: none !important;
-    }
-
-    .details-hero-content {
-        min-height: auto !important;
-        padding: 20px !important;
-        flex-direction: column !important;
-    }
-
-    .details-poster {
-        flex: 0 0 200px !important;
-        width: 200px !important;
-    }
-
-    .movie-row {
-        overflow-x: visible !important;
-        flex-wrap: wrap !important;
-        gap: 12px !important;
-    }
-
-    .movies-grid {
-        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)) !important;
-    }
+body {
+    font-family: var(--font);
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    line-height: 1.6;
+    overflow-x: hidden;
 }
