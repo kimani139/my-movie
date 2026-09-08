@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MyMovie - Discover Movies</title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <div class="nav-left">
+                <a href="/" class="logo">
+                    <i class="fas fa-film"></i>
+                    <span>MyMovie</span>
+                </a>
+            </div>
+            
+            <div class="nav-center">
+                <ul class="nav-links">
+                    <li><a href="/" class="active">Home</a></li>
+                    <li><a href="/movies.html">Movies</a></li>
+                    <li><a href="#genres" id="genresLink">Genres</a></li>
+                    <li><a href="/favorites.html">Favorites</a></li>
+                </ul>
+            </div>
+            
+            <div class="nav-right">
+                <div class="search-container">
+                    <input type="text" id="searchInput" placeholder="Search movies..." />
+                    <button id="searchBtn"><i class="fas fa-search"></i></button>
+                </div>
+                <button class="nav-toggle" id="navToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero" id="hero">
+        <div class="hero-content">
+            <div class="hero-text">
+                <span class="hero-badge">Trending Now</span>
+                <h1 class="hero-title" id="heroTitle">Loading...</h1>
+                <p class="hero-description" id="heroDescription">Fetching the best movies for you</p>
+                <div class="hero-meta" id="heroMeta">
+                    <span class="hero-rating"><i class="fas fa-star"></i> <span id="heroRating">0</span></span>
+                    <span class="hero-year" id="heroYear">2024</span>
+                    <span class="hero-genres" id="heroGenres">Action, Adventure</span>
+                </div>
+                <div class="hero-buttons">
+                    <button class="btn btn-primary" id="heroWatchBtn">
+                        <i class="fas fa-play"></i> Watch Now
+                    </button>
+                    <button class="btn btn-secondary" id="heroFavoriteBtn">
+                        <i class="fas fa-heart"></i> Add to Favorites
+                    </button>
+                </div>
+            </div>
+            <div class="hero-backdrop" id="heroBackdrop">
+                <div class="hero-gradient"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Movie Sections -->
+    <main class="main-content">
+        <section class="movie-section" id="trendingSection">
+            <div class="section-header">
+                <h2><i class="fas fa-fire"></i> Trending Now</h2>
+                <a href="#" class="view-all">View All <i class="fas fa-arrow-right"></i></a>
+            </div>
+            <div class="movie-row" id="trendingRow"></div>
+        </section>
+
+        <section class="movie-section" id="popularSection">
+            <div class="section-header">
+                <h2><i class="fas fa-chart-line"></i> Popular</h2>
+                <a href="#" class="view-all">View All <i class="fas fa-arrow-right"></i></a>
+            </div>
+            <div class="movie-row" id="popularRow"></div>
+        </section>
+
+        <section class="movie-section" id="topRatedSection">
+            <div class="section-header">
+                <h2><i class="fas fa-star"></i> Top Rated</h2>
+                <a href="#" class="view-all">View All <i class="fas fa-arrow-right"></i></a>
+            </div>
+            <div class="movie-row" id="topRatedRow"></div>
+        </section>
+
+        <section class="movie-section" id="upcomingSection">
+            <div class="section-header">
+                <h2><i class="fas fa-clock"></i> Upcoming</h2>
+                <a href="#" class="view-all">View All <i class="fas fa-arrow-right"></i></a>
+            </div>
+            <div class="movie-row" id="upcomingRow"></div>
+        </section>
+    </main>
+
+    <!-- Toast -->
+    <div id="toast" class="toast"></div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-brand">
+                <h3><i class="fas fa-film"></i> MyMovie</h3>
+                <p>Discover, explore, and enjoy movies.</p>
+            </div>
+            <div class="footer-links">
+                <a href="#">About</a>
+                <a href="#">Privacy</a>
+                <a href="#">Terms</a>
+                <a href="#">Contact</a>
+            </div>
+            <div class="footer-attribution">
+                <p>Powered by <a href="https://www.themoviedb.org/" target="_blank">TMDB</a></p>
+            </div>
+        </div>
+    </footer>
+
+    <script type="module" src="/js/main.js"></script>
+</body>
+</html>

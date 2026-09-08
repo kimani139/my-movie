@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MyMovie - All Movies</title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+</head>
+<body>
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <div class="nav-left">
+                <a href="/" class="logo">
+                    <i class="fas fa-film"></i>
+                    <span>MyMovie</span>
+                </a>
+            </div>
+            <div class="nav-center">
+                <ul class="nav-links">
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/movies.html" class="active">Movies</a></li>
+                    <li><a href="#genres" id="genresLink">Genres</a></li>
+                    <li><a href="/favorites.html">Favorites</a></li>
+                </ul>
+            </div>
+            <div class="nav-right">
+                <div class="search-container">
+                    <input type="text" id="searchInput" placeholder="Search movies..." />
+                    <button id="searchBtn"><i class="fas fa-search"></i></button>
+                </div>
+                <button class="nav-toggle" id="navToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="movies-page">
+        <div class="page-header">
+            <h1>All Movies</h1>
+            <div class="filter-controls">
+                <select id="genreFilter" class="filter-select">
+                    <option value="">All Genres</option>
+                </select>
+                <select id="sortFilter" class="filter-select">
+                    <option value="popularity.desc">Most Popular</option>
+                    <option value="vote_average.desc">Top Rated</option>
+                    <option value="release_date.desc">Newest</option>
+                </select>
+            </div>
+        </div>
+        <div class="movies-grid" id="moviesGrid"></div>
+        <div class="pagination" id="pagination">
+            <button id="prevPage" class="btn btn-secondary">Previous</button>
+            <span id="pageInfo">Page 1</span>
+            <button id="nextPage" class="btn btn-secondary">Next</button>
+        </div>
+    </main>
+
+    <div id="toast" class="toast"></div>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-brand">
+                <h3><i class="fas fa-film"></i> MyMovie</h3>
+                <p>Discover, explore, and enjoy movies.</p>
+            </div>
+            <div class="footer-links">
+                <a href="#">About</a>
+                <a href="#">Privacy</a>
+                <a href="#">Terms</a>
+                <a href="#">Contact</a>
+            </div>
+            <div class="footer-attribution">
+                <p>Powered by <a href="https://www.themoviedb.org/" target="_blank">TMDB</a></p>
+            </div>
+        </div>
+    </footer>
+
+    <script type="module">
+        import { movieAPI } from './js/api.js';
+        import { favoritesService } from './js/favorites.js';
+        import { showToast, getYear, getQueryParam } from './js/utils.js';
+        import { initSearch } from './js/search.js';
+
+        // Initialize search
+        initSearch();
+
+        let currentPage = 1;
+        let currentGenre = '';
+        let currentSort = 'popularity.desc';
+        let totalPages = 1;
+
+        const grid = document.getElementById('moviesGrid');
+
+        async function loadMovies() {
+            try {
+                grid.innerHTML = '<div class="loading-spinner"><div class="spinner"></div></div>';
+
+                let data;
+                const searchQuery = getQueryParam('search');
+                
+                if (searchQuery) {
+                    data = await movieAPI.searchMovies(searchQuery, currentPage);
+                    document.querySelector('.page-header h1').textContent = `Results for "${searchQuery}"`;
+                } else if (currentGenre) {
+                    data = await movieAPI.getMoviesByGenre(currentGenre, currentPage);
+                } else {
+                    data = await movieAPI.getPopularMovies(currentPage);
+                }
+
+                totalPages = data.total_pages || 1;
+                renderMovies(data.results);
+                updatePagination();
+
+            } catch (error) {
+                console.error('Failed to load movies:', error);
+                grid.innerHTML = `<div class="error-state">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <p>Failed to load movies</p>
+                    <button class="btn btn-primary" onclick="location.reload()">Retry</button>
+                </div>`;
+            }
+        }
+
+        function renderMovies(movies) {
+            if (!movies || movies.length === 0) {
+                grid.innerHTML = `<div class="empty-state">
+                    <i class="fas fa-film"></i>
+                    <p>No movies found</p>
+                </div>`;
+                return;
+            }
+
+            grid.innerHTML = movies.map(movie => `
+                <div class="movie-card" onclick="window.location.href='/details.html?id=${movie.id}'">
+                    <div class="movie-card-poster">
+                        <img 
+                            src="${movieAPI.getPosterUrl(movie.poster_path)}" 
+                            alt="${movie.title}"
+                            loading="lazy"
+                            onerror="this.src='/assets/images/placeholder.jpg'"
+                        />
+                        <span class="movie-card-rating">
+                            <i class="fas fa-star"></i> ${movie.vote_average?.toFixed(1) || 'N/A'}
+                        </span>
+                        <button class="movie-card-favorite" data-id="${movie.id}" onclick="event.stopPropagation()">
+                            <i class="${favoritesService.isFavorite(movie.id) ? 'fas' : 'far'} fa-heart"></i>
+                        </button>
+                    </div>
+                    <div class="movie-card-info">
+                        <h4 class="movie-card-title">${movie.title}</h4>
+                        <div class="movie-card-meta">
+                            <span>${getYear(movie.release_date)}</span>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+
+            // Add favorite listeners
+            grid.querySelectorAll('.movie-card-favorite').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const movieId = parseInt(btn.dataset.id);
+                    const movie = movies.find(m => m.id === movieId);
+                    if (movie) {
+                        const isFav = favoritesService.toggle(movie);
+                        btn.querySelector('i').className = isFav ? 'fas fa-heart' : 'far fa-heart';
+                        showToast(isFav ? 'Added to favorites ❤️' : 'Removed from favorites 💔');
+                    }
+                });
+            });
+        }
+
+        function updatePagination() {
+            document.getElementById('pageInfo').textContent = `Page ${currentPage} of ${totalPages}`;
+            document.getElementById('prevPage').disabled = currentPage <= 1;
+            document.getElementById('nextPage').disabled = currentPage >= totalPages;
+        }
+
+        // Setup pagination
+        document.getElementById('prevPage').addEventListener('click', () => {
+            if (currentPage > 1) {
+                currentPage--;
+                loadMovies();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        });
+
+        document.getElementById('nextPage').addEventListener('click', () => {
+            if (currentPage < totalPages) {
+                currentPage++;
+                loadMovies();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        });
+
+        // Setup filters
+        document.getElementById('genreFilter').addEventListener('change', (e) => {
+            currentGenre = e.target.value;
+            currentPage = 1;
+            loadMovies();
+        });
+
+        document.getElementById('sortFilter').addEventListener('change', (e) => {
+            currentSort = e.target.value;
+            currentPage = 1;
+            loadMovies();
+        });
+
+        // Load genres for filter
+        async function loadGenres() {
+            try {
+                const data = await movieAPI.getGenres();
+                const select = document.getElementById('genreFilter');
+                data.genres.forEach(genre => {
+                    const option = document.createElement('option');
+                    option.value = genre.id;
+                    option.textContent = genre.name;
+                    select.appendChild(option);
+                });
+            } catch (error) {
+                console.error('Failed to load genres:', error);
+            }
+        }
+
+        // Mobile nav
+        document.getElementById('navToggle').addEventListener('click', () => {
+            document.querySelector('.nav-center').classList.toggle('open');
+        });
+
+        // Initial load
+        loadGenres();
+        loadMovies();
+    </script>
+</body>
+</html>

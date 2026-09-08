@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MyMovie - Your Favorites</title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+</head>
+<body>
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <div class="nav-left">
+                <a href="/" class="logo">
+                    <i class="fas fa-film"></i>
+                    <span>MyMovie</span>
+                </a>
+            </div>
+            <div class="nav-center">
+                <ul class="nav-links">
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/movies.html">Movies</a></li>
+                    <li><a href="#genres" id="genresLink">Genres</a></li>
+                    <li><a href="/favorites.html" class="active">Favorites</a></li>
+                </ul>
+            </div>
+            <div class="nav-right">
+                <div class="search-container">
+                    <input type="text" id="searchInput" placeholder="Search favorites..." />
+                    <button id="searchBtn"><i class="fas fa-search"></i></button>
+                </div>
+                <button class="nav-toggle" id="navToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="favorites-page">
+        <div class="page-header">
+            <h1><i class="fas fa-heart" style="color: var(--accent);"></i> Your Favorites</h1>
+            <span id="favCount" class="fav-count">0 movies</span>
+            <button id="clearFavorites" class="btn btn-secondary" style="font-size: 0.85rem; padding: 8px 16px;">
+                <i class="fas fa-trash"></i> Clear All
+            </button>
+        </div>
+        <div class="movies-grid" id="favoritesGrid"></div>
+    </main>
+
+    <div id="toast" class="toast"></div>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-brand">
+                <h3><i class="fas fa-film"></i> MyMovie</h3>
+                <p>Discover, explore, and enjoy movies.</p>
+            </div>
+            <div class="footer-links">
+                <a href="#">About</a>
+                <a href="#">Privacy</a>
+                <a href="#">Terms</a>
+                <a href="#">Contact</a>
+            </div>
+            <div class="footer-attribution">
+                <p>Powered by <a href="https://www.themoviedb.org/" target="_blank">TMDB</a></p>
+            </div>
+        </div>
+    </footer>
+
+    <script type="module">
+        import { movieAPI } from './js/api.js';
+        import { favoritesService } from './js/favorites.js';
+        import { showToast, getYear, debounce } from './js/utils.js';
+        import { initSearch } from './js/search.js';
+
+        // Initialize search
+        initSearch();
+
+        const grid = document.getElementById('favoritesGrid');
+        let searchQuery = '';
+
+        function renderFavorites() {
+            let favorites = favoritesService.getAll();
+            
+            // Filter by search
+            if (searchQuery) {
+                favorites = favorites.filter(movie => 
+                    movie.title.toLowerCase().includes(searchQuery.toLowerCase())
+                );
+            }
+
+            document.getElementById('favCount').textContent = `${favorites.length} movies`;
+
+            if (favorites.length === 0) {
+                grid.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-heart" style="font-size: 4rem; color: var(--text-muted);"></i>
+                        <h2>No favorites yet</h2>
+                        <p>Start adding movies you love to your favorites list!</p>
+                        <a href="/movies.html" class="btn btn-primary">Browse Movies</a>
+                    </div>
+                `;
+                return;
+            }
+
+            grid.innerHTML = favorites.map(movie => `
+                <div class="movie-card" onclick="window.location.href='/details.html?id=${movie.id}'">
+                    <div class="movie-card-poster">
+                        <img 
+                            src="${movieAPI.getPosterUrl(movie.poster_path)}" 
+                            alt="${movie.title}"
+                            loading="lazy"
+                            onerror="this.src='/assets/images/placeholder.jpg'"
+                        />
+                        <span class="movie-card-rating">
+                            <i class="fas fa-star"></i> ${movie.vote_average?.toFixed(1) || 'N/A'}
+                        </span>
+                        <button class="movie-card-favorite active" data-id="${movie.id}" onclick="event.stopPropagation()">
+                            <i class="fas fa-heart"></i>
+                        </button>
+                    </div>
+                    <div class="movie-card-info">
+                        <h4 class="movie-card-title">${movie.title}</h4>
+                        <div class="movie-card-meta">
+                            <span>${getYear(movie.release_date)}</span>
+                            <span>❤️ ${new Date(movie.added_at).toLocaleDateString()}</span>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+
+            grid.querySelectorAll('.movie-card-favorite').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const movieId = parseInt(btn.dataset.id);
+                    const movie = favorites.find(m => m.id === movieId);
+                    if (movie) {
+                        favoritesService.remove(movieId);
+                        renderFavorites();
+                        showToast(`Removed "${movie.title}" from favorites 💔`);
+                    }
+                });
+            });
+        }
+
+        // Search favorites
+        const searchInput = document.getElementById('searchInput');
+        const debouncedSearch = debounce((e) => {
+            searchQuery = e.target.value.trim();
+            renderFavorites();
+        }, 300);
+        searchInput?.addEventListener('input', debouncedSearch);
+
+        // Clear all favorites
+        document.getElementById('clearFavorites').addEventListener('click', () => {
+            if (confirm('Are you sure you want to remove all favorites?')) {
+                favoritesService.clearAll();
+                renderFavorites();
+                showToast('All favorites cleared 💔');
+            }
+        });
+
+        // Mobile nav
+        document.getElementById('navToggle').addEventListener('click', () => {
+            document.querySelector('.nav-center').classList.toggle('open');
+        });
+
+        // Initial render
+        renderFavorites();
+    </script>
+</body>
+</html>

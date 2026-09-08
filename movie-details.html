@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MyMovie - Movie Details</title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+</head>
+<body>
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <div class="nav-left">
+                <a href="/" class="logo">
+                    <i class="fas fa-film"></i>
+                    <span>MyMovie</span>
+                </a>
+            </div>
+            <div class="nav-center">
+                <ul class="nav-links">
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/movies.html">Movies</a></li>
+                    <li><a href="#genres" id="genresLink">Genres</a></li>
+                    <li><a href="/favorites.html">Favorites</a></li>
+                </ul>
+            </div>
+            <div class="nav-right">
+                <div class="search-container">
+                    <input type="text" id="searchInput" placeholder="Search movies..." />
+                    <button id="searchBtn"><i class="fas fa-search"></i></button>
+                </div>
+                <button class="nav-toggle" id="navToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="details-page" id="detailsPage">
+        <div class="details-container">
+            <button class="back-btn" id="backBtn">
+                <i class="fas fa-arrow-left"></i> Back
+            </button>
+
+            <div class="details-loading" id="detailsLoading">
+                <div class="spinner"></div>
+                <p>Loading movie details...</p>
+            </div>
+
+            <div class="details-error" id="detailsError" style="display: none;">
+                <i class="fas fa-exclamation-circle"></i>
+                <h2>Oops! Something went wrong</h2>
+                <p id="errorMessage">Failed to load movie details</p>
+                <button class="btn btn-primary" id="retryBtn">Try Again</button>
+            </div>
+
+            <div class="details-content" id="detailsContent" style="display: none;">
+                <div class="details-hero" id="detailsHero">
+                    <div class="details-hero-overlay"></div>
+                    <div class="details-hero-content">
+                        <div class="details-poster">
+                            <img id="detailPoster" src="" alt="Movie Poster" />
+                        </div>
+                        <div class="details-info">
+                            <h1 id="detailTitle">Movie Title</h1>
+                            <div class="details-meta">
+                                <span class="detail-rating">
+                                    <i class="fas fa-star"></i> <span id="detailRating">0</span>
+                                </span>
+                                <span class="detail-year" id="detailYear">2024</span>
+                                <span class="detail-runtime" id="detailRuntime">2h 30m</span>
+                            </div>
+                            <div class="detail-genres" id="detailGenres"></div>
+                            <p class="detail-overview" id="detailOverview">Movie description goes here...</p>
+                            <div class="detail-cast" id="detailCast">
+                                <h4>Cast</h4>
+                                <div class="cast-list" id="castList"></div>
+                            </div>
+                            <div class="detail-actions">
+                                <button class="btn btn-primary" id="detailWatchBtn">
+                                    <i class="fas fa-play"></i> Watch Now
+                                </button>
+                                <button class="btn btn-secondary" id="detailFavoriteBtn">
+                                    <i class="fas fa-heart"></i> Add to Favorites
+                                </button>
+                                <button class="btn btn-secondary" id="detailTrailerBtn">
+                                    <i class="fas fa-film"></i> Trailer
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <section class="movie-section" id="similarSection">
+                    <div class="section-header">
+                        <h2><i class="fas fa-film"></i> Similar Movies</h2>
+                    </div>
+                    <div class="movie-row" id="similarRow"></div>
+                </section>
+            </div>
+        </div>
+    </main>
+
+    <div id="toast" class="toast"></div>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-brand">
+                <h3><i class="fas fa-film"></i> MyMovie</h3>
+                <p>Discover, explore, and enjoy movies.</p>
+            </div>
+            <div class="footer-links">
+                <a href="#">About</a>
+                <a href="#">Privacy</a>
+                <a href="#">Terms</a>
+                <a href="#">Contact</a>
+            </div>
+            <div class="footer-attribution">
+                <p>Powered by <a href="https://www.themoviedb.org/" target="_blank">TMDB</a></p>
+            </div>
+        </div>
+    </footer>
+
+    <script type="module" src="/js/details.js"></script>
+</body>
+</html>
