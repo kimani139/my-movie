@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 </head>
 <body>
+    <!-- Navigation -->
     <nav class="navbar" id="navbar">
         <div class="nav-container">
             <div class="nav-left">
@@ -38,30 +39,44 @@
         </div>
     </nav>
 
+    <!-- Main Content -->
     <main class="movies-page">
         <div class="page-header">
-            <h1>All Movies</h1>
+            <h1><i class="fas fa-film"></i> All Movies</h1>
             <div class="filter-controls">
                 <select id="genreFilter" class="filter-select">
-                    <option value="">All Genres</option>
+                    <option value="">🎭 All Genres</option>
                 </select>
                 <select id="sortFilter" class="filter-select">
-                    <option value="popularity.desc">Most Popular</option>
-                    <option value="vote_average.desc">Top Rated</option>
-                    <option value="release_date.desc">Newest</option>
+                    <option value="popularity.desc">🔥 Most Popular</option>
+                    <option value="vote_average.desc">⭐ Top Rated</option>
+                    <option value="release_date.desc">🆕 Newest</option>
+                    <option value="title.asc">🔤 A-Z</option>
                 </select>
             </div>
         </div>
-        <div class="movies-grid" id="moviesGrid"></div>
+        
+        <div class="movies-grid" id="moviesGrid">
+            <!-- Movies will be loaded here -->
+            <div class="loading-spinner"><div class="spinner"></div></div>
+        </div>
+        
+        <!-- Pagination -->
         <div class="pagination" id="pagination">
-            <button id="prevPage" class="btn btn-secondary">Previous</button>
-            <span id="pageInfo">Page 1</span>
-            <button id="nextPage" class="btn btn-secondary">Next</button>
+            <button class="btn btn-secondary" id="prevPage">
+                <i class="fas fa-chevron-left"></i> Previous
+            </button>
+            <span id="pageInfo">Page 1 of 1</span>
+            <button class="btn btn-secondary" id="nextPage">
+                Next <i class="fas fa-chevron-right"></i>
+            </button>
         </div>
     </main>
 
+    <!-- Toast -->
     <div id="toast" class="toast"></div>
 
+    <!-- Footer -->
     <footer class="footer">
         <div class="footer-content">
             <div class="footer-brand">
@@ -80,10 +95,11 @@
         </div>
     </footer>
 
+    <!-- ===== SCRIPTS ===== -->
     <script type="module">
         import { movieAPI } from './js/api.js';
         import { favoritesService } from './js/favorites.js';
-        import { showToast, getYear, getQueryParam } from './js/utils.js';
+        import { showToast, getYear, debounce, getQueryParam } from './js/utils.js';
         import { initSearch } from './js/search.js';
 
         // Initialize search
@@ -93,45 +109,54 @@
         let currentGenre = '';
         let currentSort = 'popularity.desc';
         let totalPages = 1;
+        let currentQuery = getQueryParam('search') || '';
 
         const grid = document.getElementById('moviesGrid');
 
-        async function loadMovies() {
+        // Load movies
+        async function loadMovies(page = 1) {
             try {
                 grid.innerHTML = '<div class="loading-spinner"><div class="spinner"></div></div>';
-
-                let data;
-                const searchQuery = getQueryParam('search');
                 
-                if (searchQuery) {
-                    data = await movieAPI.searchMovies(searchQuery, currentPage);
-                    document.querySelector('.page-header h1').textContent = `Results for "${searchQuery}"`;
+                let data;
+                
+                if (currentQuery) {
+                    data = await movieAPI.searchMovies(currentQuery, page);
+                    document.querySelector('.page-header h1').textContent = `🔍 Results for "${currentQuery}"`;
                 } else if (currentGenre) {
-                    data = await movieAPI.getMoviesByGenre(currentGenre, currentPage);
+                    data = await movieAPI.getMoviesByGenre(currentGenre, page);
                 } else {
-                    data = await movieAPI.getPopularMovies(currentPage);
+                    data = await movieAPI.getPopularMovies(page);
                 }
 
-                totalPages = data.total_pages || 1;
+                totalPages = data.total_pages > 500 ? 500 : data.total_pages;
                 renderMovies(data.results);
                 updatePagination();
 
             } catch (error) {
                 console.error('Failed to load movies:', error);
-                grid.innerHTML = `<div class="error-state">
-                    <i class="fas fa-exclamation-circle"></i>
-                    <p>Failed to load movies</p>
-                    <button class="btn btn-primary" onclick="location.reload()">Retry</button>
-                </div>`;
+                grid.innerHTML = `
+                    <div class="error-state" style="grid-column: 1/-1; text-align: center; padding: 60px 20px;">
+                        <i class="fas fa-exclamation-circle" style="font-size: 3rem; color: var(--accent);"></i>
+                        <p style="color: var(--text-secondary); margin-top: 16px;">Failed to load movies</p>
+                        <button class="btn btn-primary" onclick="location.reload()" style="margin-top: 16px;">
+                            <i class="fas fa-sync"></i> Retry
+                        </button>
+                    </div>
+                `;
             }
         }
 
+        // Render movies
         function renderMovies(movies) {
             if (!movies || movies.length === 0) {
-                grid.innerHTML = `<div class="empty-state">
-                    <i class="fas fa-film"></i>
-                    <p>No movies found</p>
-                </div>`;
+                grid.innerHTML = `
+                    <div class="empty-state" style="grid-column: 1/-1; text-align: center; padding: 60px 20px;">
+                        <i class="fas fa-film" style="font-size: 3rem; color: var(--text-muted);"></i>
+                        <h2 style="margin-top: 16px;">No movies found</h2>
+                        <p style="color: var(--text-secondary);">Try adjusting your filters</p>
+                    </div>
+                `;
                 return;
             }
 
@@ -169,12 +194,13 @@
                     if (movie) {
                         const isFav = favoritesService.toggle(movie);
                         btn.querySelector('i').className = isFav ? 'fas fa-heart' : 'far fa-heart';
-                        showToast(isFav ? 'Added to favorites ❤️' : 'Removed from favorites 💔');
+                        showToast(isFav ? '❤️ Added to favorites' : '💔 Removed from favorites');
                     }
                 });
             });
         }
 
+        // Update pagination
         function updatePagination() {
             document.getElementById('pageInfo').textContent = `Page ${currentPage} of ${totalPages}`;
             document.getElementById('prevPage').disabled = currentPage <= 1;
@@ -185,7 +211,7 @@
         document.getElementById('prevPage').addEventListener('click', () => {
             if (currentPage > 1) {
                 currentPage--;
-                loadMovies();
+                loadMovies(currentPage);
                 window.scrollTo({ top: 0, behavior: 'smooth' });
             }
         });
@@ -193,7 +219,7 @@
         document.getElementById('nextPage').addEventListener('click', () => {
             if (currentPage < totalPages) {
                 currentPage++;
-                loadMovies();
+                loadMovies(currentPage);
                 window.scrollTo({ top: 0, behavior: 'smooth' });
             }
         });
@@ -202,6 +228,7 @@
         document.getElementById('genreFilter').addEventListener('change', (e) => {
             currentGenre = e.target.value;
             currentPage = 1;
+            currentQuery = '';
             loadMovies();
         });
 
@@ -211,7 +238,7 @@
             loadMovies();
         });
 
-        // Load genres for filter
+        // Load genres
         async function loadGenres() {
             try {
                 const data = await movieAPI.getGenres();
@@ -227,7 +254,13 @@
             }
         }
 
-        // Mobile nav
+        // Search handler
+        const searchInput = document.getElementById('searchInput');
+        if (searchInput && currentQuery) {
+            searchInput.value = currentQuery;
+        }
+
+        // Mobile nav toggle
         document.getElementById('navToggle').addEventListener('click', () => {
             document.querySelector('.nav-center').classList.toggle('open');
         });
