@@ -1,6 +1,6 @@
 // ===== CONFIGURATION =====
 export const CONFIG = {
-    TMDB_API_KEY: import.meta.env.TMDB_API_KEY || "YOUR_TMDB_API_KEY_HERE",
+    TMDB_API_KEY: 61366e6649a909775e65256e37207466
     TMDB_BASE_URL: "https://api.themoviedb.org/3",
     TMDB_IMAGE_BASE: "https://image.tmdb.org/t/p",
     POSTER_SIZE: "w500",
